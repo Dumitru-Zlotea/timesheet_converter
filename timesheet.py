@@ -1,6 +1,6 @@
 import re
 from collections import defaultdict
-from datetime import datetime
+from datetime import datetime, timedelta
 
 
 def extract_periods_by_day():
@@ -33,6 +33,11 @@ def calculate_total_time(extracted_hours: dict):
             start = datetime.strptime(period[0], time_format)
             end = datetime.strptime(period[1], time_format)
 
+            if end < start:
+                # If the worked hours span on two days, add 1 day to 
+                # the end time
+                end = end + timedelta(days=1)
+
             total_day_time = end - start
 
             if day in total_time_per_day:
@@ -62,7 +67,10 @@ def write_result(converted_hours: dict):
 
 
 if __name__ == '__main__':
-    extracted_hours = extract_periods_by_day()
-    converted_hours = calculate_total_time(extracted_hours)
-    write_result(converted_hours)
-    
+    try:
+        extracted_hours = extract_periods_by_day()
+        converted_hours = calculate_total_time(extracted_hours)
+        write_result(converted_hours)
+    except Exception as e:
+        with open("error.txt", "w") as file:
+            file.write(e)
