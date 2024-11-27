@@ -1,6 +1,13 @@
 import re
 from collections import defaultdict
 from datetime import datetime, timedelta
+import os
+import subprocess
+import platform
+
+
+INPUT_FILE =    'work_hours.txt'
+OUTPUT_FILE =   'result.txt'
 
 
 def extract_periods_by_day():
@@ -10,7 +17,7 @@ def extract_periods_by_day():
     periods_by_day = defaultdict(list)
     current_day = None
 
-    with open('work_hours.txt') as file:
+    with open(INPUT_FILE) as file:
         for line in file:
             day_match = re.search(day_pattern, line)
             if day_match:
@@ -57,7 +64,7 @@ def calculate_total_time(extracted_hours: dict):
 
 
 def write_result(converted_hours: dict):
-    with open("result.txt", "w") as file:
+    with open(OUTPUT_FILE, "w") as file:
         for day, hours in converted_hours.items():
             if day == 'total':
                 day = '\n' + day + '  ->\t'
@@ -66,11 +73,26 @@ def write_result(converted_hours: dict):
             file.write(f'{day}{hours}\n')
 
 
+class FileOpenError(Exception):
+    def __init__(self, message):
+        super().__init__(message)
+
+
+def open_result_file():
+    if platform.system() == 'Windows':
+        os.startfile(OUTPUT_FILE)
+    elif platform.system() == 'Linux':
+        subprocess.run(['xdg-open', OUTPUT_FILE])
+    else:
+        raise FileOpenError(f'Failed to open file {OUTPUT_FILE}')
+
+
 if __name__ == '__main__':
     try:
         extracted_hours = extract_periods_by_day()
         converted_hours = calculate_total_time(extracted_hours)
         write_result(converted_hours)
+        open_result_file()
     except Exception as e:
         with open("error.txt", "w") as file:
             file.write(e)
