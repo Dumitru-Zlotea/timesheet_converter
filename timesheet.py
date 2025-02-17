@@ -8,11 +8,12 @@ import platform
 
 INPUT_FILE =    'work_hours.txt'
 OUTPUT_FILE =   'result.txt'
+ERROR_FILE =    'error.txt'
 
 
 def extract_periods_by_day():
     time_pattern = r'\b\d{2}h\d{2} - \d{2}h\d{2}\b'
-    day_pattern = r'([a-zA-Zéû]+ \d{2}):'
+    day_pattern = r'([a-zA-Zéû]+ \d{2})[\s]?(\(\w+\))?:'
 
     periods_by_day = defaultdict(list)
     current_day = None
@@ -78,13 +79,13 @@ class FileOpenError(Exception):
         super().__init__(message)
 
 
-def open_result_file():
+def open_file(filename: str):
     if platform.system() == 'Windows':
-        os.startfile(OUTPUT_FILE)
+        os.startfile(filename)
     elif platform.system() == 'Linux':
-        subprocess.run(['xdg-open', OUTPUT_FILE])
+        subprocess.run(['xdg-open', filename])
     else:
-        raise FileOpenError(f'Failed to open file {OUTPUT_FILE}')
+        raise FileOpenError(f'Failed to open file {filename}')
 
 
 if __name__ == '__main__':
@@ -92,7 +93,12 @@ if __name__ == '__main__':
         extracted_hours = extract_periods_by_day()
         converted_hours = calculate_total_time(extracted_hours)
         write_result(converted_hours)
-        open_result_file()
+        open_file(OUTPUT_FILE)
+    except AttributeError as e:
+        with open(ERROR_FILE, "w") as file:
+            file.write(e.args[0])
+        open_file(ERROR_FILE)
     except Exception as e:
-        with open("error.txt", "w") as file:
+        with open(ERROR_FILE, "w") as file:
             file.write(e)
+        open_file(ERROR_FILE)
