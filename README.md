@@ -6,12 +6,14 @@ Converts worked hours logged in the format
     14h15 - 15h00
     tuesday 01: 13h00 - 13h40
     15h50 - 17h25
+    tuesday 01 (PROJECT_CODE): 17h30 - 19h00
     ...
 
 To
 
     monday 30:    1.25
     tuesday 01:   2.25
+    tuesday 01 (PROJECT_CODE): 1.5
     ...
     total ->      X.XX
 
