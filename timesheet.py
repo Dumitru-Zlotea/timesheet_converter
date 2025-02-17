@@ -22,7 +22,7 @@ def extract_periods_by_day():
         for line in file:
             day_match = re.search(day_pattern, line)
             if day_match:
-                current_day = day_match.group(1).lower() # extract the day and store it
+                current_day = day_match.group().lower() # extract the day and store it
 
             time_matches = re.findall(time_pattern, line)
             if time_matches and current_day:
@@ -70,7 +70,7 @@ def write_result(converted_hours: dict):
             if day == 'total':
                 day = '\n' + day + '  ->\t'
             else:
-                day = day + ':\t'
+                day = day + '\t'
             file.write(f'{day}{hours}\n')
 
 
